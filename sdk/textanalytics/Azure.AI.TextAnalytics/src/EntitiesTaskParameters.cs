@@ -15,12 +15,11 @@ namespace Azure.AI.TextAnalytics
         /// <summary>
         /// ModelVersion
         /// </summary>
-        public string ModelVersion { get; set; }
+        public string ModelVersion { get; set; } = "latest";
 
         /// <summary>
         /// StringIndexType
         /// </summary>
         internal StringIndexType? StringIndexType { get; set; }
-
     }
 }

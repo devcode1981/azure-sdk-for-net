@@ -22,7 +22,6 @@ namespace Azure.Data.Tables.Tests
     /// </remarks>
     public class TableClientLiveTests : TableServiceLiveTestsBase
     {
-
         public TableClientLiveTests(bool isAsync, TableEndpointType endpointType) : base(isAsync, endpointType /* To record tests, add this argument, RecordedTestMode.Record */)
         { }
 
@@ -283,11 +282,6 @@ namespace Azure.Data.Tables.Tests
         [RecordedTest]
         public async Task EntityMergeRespectsEtag()
         {
-            if (_endpointType == TableEndpointType.CosmosTable)
-            {
-                Assert.Ignore("https://github.com/Azure/azure-sdk-for-net/issues/13555");
-            }
-
             string tableName = $"testtable{Recording.GenerateId()}";
 
             const string rowKeyValue = "1";
@@ -344,11 +338,6 @@ namespace Azure.Data.Tables.Tests
         [RecordedTest]
         public async Task EntityMergeDoesPartialPropertyUpdates()
         {
-            if (_endpointType == TableEndpointType.CosmosTable)
-            {
-                Assert.Ignore("https://github.com/Azure/azure-sdk-for-net/issues/13555");
-            }
-
             string tableName = $"testtable{Recording.GenerateId()}";
 
             const string rowKeyValue = "1";
@@ -369,7 +358,6 @@ namespace Azure.Data.Tables.Tests
                     {"RowKey", rowKeyValue},
                     {mergepropertyName, mergeValue}
                 };
-
 
             // Create the new entity.
 
@@ -741,11 +729,6 @@ namespace Azure.Data.Tables.Tests
         [RecordedTest]
         public async Task CustomEntityMergeRespectsEtag()
         {
-            if (_endpointType == TableEndpointType.CosmosTable)
-            {
-                Assert.Ignore("https://github.com/Azure/azure-sdk-for-net/issues/13555");
-            }
-
             string tableName = $"testtable{Recording.GenerateId()}";
 
             const string rowKeyValue = "1";
@@ -888,6 +871,7 @@ namespace Azure.Data.Tables.Tests
                 Assert.That(entityResults[i].PartitionKey, Is.EqualTo(entitiesToCreate[i].PartitionKey), "The entities should be equivalent");
                 Assert.That(entityResults[i].RowKey, Is.EqualTo(entitiesToCreate[i].RowKey), "The entities should be equivalent");
                 Assert.That(entityResults[i].StringTypeProperty, Is.EqualTo(entitiesToCreate[i].StringTypeProperty), "The entities should be equivalent");
+                Assert.That(entityResults[i].ETag, Is.Not.EqualTo(default(ETag)), $"ETag value should not be default: {entityResults[i].ETag}");
             }
         }
 
@@ -928,11 +912,6 @@ namespace Azure.Data.Tables.Tests
         [RecordedTest]
         public async Task GetAccessPoliciesReturnsPolicies()
         {
-            if (_endpointType == TableEndpointType.CosmosTable)
-            {
-                Assert.Ignore("GetAccessPolicy is currently not supported by Cosmos endpoints.");
-            }
-
             // Create some policies.
 
             var policyToCreate = new List<SignedIdentifier>
@@ -950,7 +929,6 @@ namespace Azure.Data.Tables.Tests
             Assert.That(policies.Value[0].AccessPolicy.ExpiresOn, Is.EqualTo(policyToCreate[0].AccessPolicy.ExpiresOn));
             Assert.That(policies.Value[0].AccessPolicy.Permission, Is.EqualTo(policyToCreate[0].AccessPolicy.Permission));
             Assert.That(policies.Value[0].AccessPolicy.StartsOn, Is.EqualTo(policyToCreate[0].AccessPolicy.StartsOn));
-
         }
 
         /// <summary>
@@ -982,7 +960,7 @@ namespace Azure.Data.Tables.Tests
             var entitiesToCreate = CreateCustomTableEntities(PartitionKeyValue, 5);
 
             // Create the batch.
-            var batch = client.CreateTransactionalBatch(entitiesToCreate[0].PartitionKey);
+            var batch = InstrumentClient(client.CreateTransactionalBatch(entitiesToCreate[0].PartitionKey));
 
             batch.SetBatchGuids(Recording.Random.NewGuid(), Recording.Random.NewGuid());
 
@@ -1020,7 +998,7 @@ namespace Azure.Data.Tables.Tests
             await client.AddEntityAsync(entitiesToCreate[2]).ConfigureAwait(false);
 
             // Create the batch.
-            TableTransactionalBatch batch = client.CreateTransactionalBatch(entitiesToCreate[0].PartitionKey);
+            TableTransactionalBatch batch = InstrumentClient(client.CreateTransactionalBatch(entitiesToCreate[0].PartitionKey));
 
             batch.SetBatchGuids(Recording.Random.NewGuid(), Recording.Random.NewGuid());
 
@@ -1077,7 +1055,7 @@ namespace Azure.Data.Tables.Tests
             var entitiesToCreate = CreateCustomTableEntities(PartitionKeyValue, 4);
 
             // Create the batch.
-            var batch = client.CreateTransactionalBatch(entitiesToCreate[0].PartitionKey);
+            var batch = InstrumentClient(client.CreateTransactionalBatch(entitiesToCreate[0].PartitionKey));
 
             batch.SetBatchGuids(Recording.Random.NewGuid(), Recording.Random.NewGuid());
 

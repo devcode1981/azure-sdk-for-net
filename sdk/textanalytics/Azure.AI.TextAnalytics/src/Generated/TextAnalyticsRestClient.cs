@@ -49,10 +49,10 @@ namespace Azure.AI.TextAnalytics
             uri.AppendRaw("/text/analytics/v3.1-preview.3", false);
             uri.AppendPath("/analyze", false);
             request.Uri = uri;
-            request.Headers.Add("Content-Type", "application/json");
             request.Headers.Add("Accept", "application/json, text/json");
             if (body != null)
             {
+                request.Headers.Add("Content-Type", "application/json");
                 var content = new Utf8JsonRequestContent();
                 content.JsonWriter.WriteObjectValue(body);
                 request.Content = content;
@@ -94,7 +94,7 @@ namespace Azure.AI.TextAnalytics
             }
         }
 
-        internal HttpMessage CreateAnalyzeStatusRequest(Guid jobId, bool? showStats, int? top, int? skip)
+        internal HttpMessage CreateAnalyzeStatusRequest(string jobId, bool? showStats, int? top, int? skip)
         {
             var message = _pipeline.CreateMessage();
             var request = message.Request;
@@ -122,13 +122,19 @@ namespace Azure.AI.TextAnalytics
         }
 
         /// <summary> Get the status of an analysis job.  A job may consist of one or more tasks.  Once all tasks are completed, the job will transition to the completed state and results will be available for each task. </summary>
-        /// <param name="jobId"> Job ID. </param>
+        /// <param name="jobId"> Job ID for Analyze. </param>
         /// <param name="showStats"> (Optional) if set to true, response will contain request and document level statistics. </param>
         /// <param name="top"> (Optional) Set the maximum number of results per task. When both $top and $skip are specified, $skip is applied first. </param>
         /// <param name="skip"> (Optional) Set the number of elements to offset in the response. When both $top and $skip are specified, $skip is applied first. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public async Task<Response<AnalyzeJobState>> AnalyzeStatusAsync(Guid jobId, bool? showStats = null, int? top = null, int? skip = null, CancellationToken cancellationToken = default)
+        /// <exception cref="ArgumentNullException"> <paramref name="jobId"/> is null. </exception>
+        public async Task<Response<AnalyzeJobState>> AnalyzeStatusAsync(string jobId, bool? showStats = null, int? top = null, int? skip = null, CancellationToken cancellationToken = default)
         {
+            if (jobId == null)
+            {
+                throw new ArgumentNullException(nameof(jobId));
+            }
+
             using var message = CreateAnalyzeStatusRequest(jobId, showStats, top, skip);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
             switch (message.Response.Status)
@@ -146,13 +152,19 @@ namespace Azure.AI.TextAnalytics
         }
 
         /// <summary> Get the status of an analysis job.  A job may consist of one or more tasks.  Once all tasks are completed, the job will transition to the completed state and results will be available for each task. </summary>
-        /// <param name="jobId"> Job ID. </param>
+        /// <param name="jobId"> Job ID for Analyze. </param>
         /// <param name="showStats"> (Optional) if set to true, response will contain request and document level statistics. </param>
         /// <param name="top"> (Optional) Set the maximum number of results per task. When both $top and $skip are specified, $skip is applied first. </param>
         /// <param name="skip"> (Optional) Set the number of elements to offset in the response. When both $top and $skip are specified, $skip is applied first. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public Response<AnalyzeJobState> AnalyzeStatus(Guid jobId, bool? showStats = null, int? top = null, int? skip = null, CancellationToken cancellationToken = default)
+        /// <exception cref="ArgumentNullException"> <paramref name="jobId"/> is null. </exception>
+        public Response<AnalyzeJobState> AnalyzeStatus(string jobId, bool? showStats = null, int? top = null, int? skip = null, CancellationToken cancellationToken = default)
         {
+            if (jobId == null)
+            {
+                throw new ArgumentNullException(nameof(jobId));
+            }
+
             using var message = CreateAnalyzeStatusRequest(jobId, showStats, top, skip);
             _pipeline.Send(message, cancellationToken);
             switch (message.Response.Status)
@@ -311,8 +323,8 @@ namespace Azure.AI.TextAnalytics
                 uri.AppendQuery("stringIndexType", stringIndexType.Value.ToString(), true);
             }
             request.Uri = uri;
-            request.Headers.Add("Content-Type", "application/json");
             request.Headers.Add("Accept", "application/json, text/json");
+            request.Headers.Add("Content-Type", "application/json");
             var content = new Utf8JsonRequestContent();
             content.JsonWriter.WriteObjectValue(input);
             request.Content = content;
@@ -391,8 +403,8 @@ namespace Azure.AI.TextAnalytics
                 uri.AppendQuery("stringIndexType", stringIndexType.Value.ToString(), true);
             }
             request.Uri = uri;
-            request.Headers.Add("Content-Type", "application/json");
             request.Headers.Add("Accept", "application/json, text/json");
+            request.Headers.Add("Content-Type", "application/json");
             var content = new Utf8JsonRequestContent();
             content.JsonWriter.WriteObjectValue(input);
             request.Content = content;
@@ -485,8 +497,8 @@ namespace Azure.AI.TextAnalytics
                 uri.AppendQuery("stringIndexType", stringIndexType.Value.ToString(), true);
             }
             request.Uri = uri;
-            request.Headers.Add("Content-Type", "application/json");
             request.Headers.Add("Accept", "application/json, text/json");
+            request.Headers.Add("Content-Type", "application/json");
             var content = new Utf8JsonRequestContent();
             content.JsonWriter.WriteObjectValue(input);
             request.Content = content;
@@ -583,8 +595,8 @@ namespace Azure.AI.TextAnalytics
                 uri.AppendQuery("stringIndexType", stringIndexType.Value.ToString(), true);
             }
             request.Uri = uri;
-            request.Headers.Add("Content-Type", "application/json");
             request.Headers.Add("Accept", "application/json, text/json");
+            request.Headers.Add("Content-Type", "application/json");
             var content = new Utf8JsonRequestContent();
             content.JsonWriter.WriteObjectValue(input);
             request.Content = content;
@@ -669,8 +681,8 @@ namespace Azure.AI.TextAnalytics
                 uri.AppendQuery("showStats", showStats.Value, true);
             }
             request.Uri = uri;
-            request.Headers.Add("Content-Type", "application/json");
             request.Headers.Add("Accept", "application/json, text/json");
+            request.Headers.Add("Content-Type", "application/json");
             var content = new Utf8JsonRequestContent();
             content.JsonWriter.WriteObjectValue(input);
             request.Content = content;
@@ -753,8 +765,8 @@ namespace Azure.AI.TextAnalytics
                 uri.AppendQuery("showStats", showStats.Value, true);
             }
             request.Uri = uri;
-            request.Headers.Add("Content-Type", "application/json");
             request.Headers.Add("Accept", "application/json, text/json");
+            request.Headers.Add("Content-Type", "application/json");
             var content = new Utf8JsonRequestContent();
             content.JsonWriter.WriteObjectValue(input);
             request.Content = content;
@@ -845,8 +857,8 @@ namespace Azure.AI.TextAnalytics
                 uri.AppendQuery("stringIndexType", stringIndexType.Value.ToString(), true);
             }
             request.Uri = uri;
-            request.Headers.Add("Content-Type", "application/json");
             request.Headers.Add("Accept", "application/json, text/json");
+            request.Headers.Add("Content-Type", "application/json");
             var content = new Utf8JsonRequestContent();
             content.JsonWriter.WriteObjectValue(input);
             request.Content = content;
